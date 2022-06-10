@@ -7,27 +7,79 @@
 
 import UIKit
 
+extension ChecklistViewController: newItemAdd, ABCTableViewCellEditFieldDelegate {
+
+    func getIndexPath(_ tableView: UITableView, selectedIndex indexPath: IndexPath) {
+    
+        if let cell = tableView.cellForRow(at: indexPath) {
+            
+//            editField()
+        }
+    }
+    
+    
+    @objc func editField(text: String) {
+        sentMess = arrayText[indexSelected].mess
+        let controller = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "addItemController") as? AddItemViewController
+        controller?.content = text
+        navigationController?.pushViewController(controller!, animated: true)
+    }
+    
+    func getItemAdd(_ inputValue: String, _ inputStatus: Bool) {
+        print(inputValue, inputStatus)
+        arrayText.append((inputValue, inputStatus))
+        print(arrayText)
+
+        print("cái này có thể gọi từ check list sang màn hình textField")
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        
+        for item in arrayText {
+            print("Item: " + item.mess + "\nStatus: " + String(item.status) + "\n")
+            
+        }
+
+        self.tableView.reloadData()
+    }
+    
+}
 
 class ChecklistViewController: UITableViewController {
 
-//    var arrayTest: [String]!
-    var arrayText: [String]!
-    var arrayChecked: [Bool]!
-        
+
+    var arrayText: [(mess: String, status: Bool)] = [(mess: "Walk the dog", status: false),
+                                       (mess: "Brush my teeth", status: false),
+                                       (mess: "Learn iOS development", status: false),
+                                       (mess: "Soccer practice", status: false),
+                                       (mess: "Eat ice cream", status: false),
+                                       (mess: "nội dung 66666666666666", status: false),
+                                       (mess: "nội dung i", status: false)]
+
+    //var
+    var itemAddGet: String = "item mới"
+    var statusGet: Bool = false
+    var receiveMess: String!
+    var sentMess: ((String?))
+    var indexSelected: Int = 0
+
+//    init(arrayText: [(String, Bool)]){
+//        self.arrayText = arrayText
+//    }
+//
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
-        
-        arrayText = ["Walk the dog", "Brush my teeth", "Learn iOS development", "Soccer practice", "Eat ice cream", "nội dung 66666666666666", "nội dung i"]
-        
-        arrayChecked = [false, false, false, false, false, false, false]
+
         self.tableView.register(UINib(nibName: "ABCTableViewCell", bundle: nil), forCellReuseIdentifier: "ABCTableViewCell")
-        
+
+        navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        
     }
+    
     
     func showAlert() {
         
@@ -53,9 +105,11 @@ class ChecklistViewController: UITableViewController {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ABCTableViewCell", for: indexPath) as? ABCTableViewCell else {
             return UITableViewCell()
         }
+        cell.delegate = self
+//        cell.infoButton.addTarget(self, action: #selector(self.editField), for: .touchUpInside)
 
-        //?????? note chỗ này, nó in ra cái false
-        cell.config(name: (indexPath.row < arrayText.count ? arrayText[indexPath.row] : "dòng thứ " + (indexPath.row % 2 == 0 ? "\t\t\t\t\t" : "") + String(indexPath.row)))
+        cell.config(name: (indexPath.row < arrayText.count ? arrayText[indexPath.row].mess : "dòng này không có trong dữ liệu!"))
+                
         return cell
     }
     
@@ -63,22 +117,28 @@ class ChecklistViewController: UITableViewController {
         return UITableView.automaticDimension
     }
         
+    //MARK: - Selected a Row
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) {
+            let checkMarkText = cell.viewWithTag(1001) as! UILabel
             if indexPath.row >= arrayText.count
             {
+                checkMarkText.text = ""
                 showAlert()
-            } else if cell.accessoryType == .none {
-                cell.accessoryType = .checkmark
-                arrayChecked[indexPath.row].toggle()
-                print("vị trí: \(indexPath.row):", arrayChecked[indexPath.row])
-                print(arrayChecked!)
-            } else {
-                cell.accessoryType = .none
-                arrayChecked[indexPath.row].toggle()
-                print("vị trí: \(indexPath.row):", arrayChecked[indexPath.row])
-                print(arrayChecked!)
+            } else if checkMarkText.text == "" {
+//                cell.accessoryType == .none {
+//                cell.accessoryType = .checkmark
+                checkMarkText.text = "√"
 
+                arrayText[indexPath.row].status.toggle()
+                print(#"message "\#(arrayText[indexPath.row].mess)" ở vị trí thứ \#(indexPath.row):"#, "Hoàn thành!")
+                print("Status: ", arrayText[indexPath.row].status)
+            } else {
+                checkMarkText.text = ""
+//                cell.accessoryType = .none
+                arrayText[indexPath.row].status.toggle()
+                print(#"message "\#(arrayText[indexPath.row].mess)" ở vị trí thứ \#(indexPath.row):"#, "Huỷ chọn!")
+                print("Status: ", arrayText[indexPath.row].status)
             }
         }
         tableView.deselectRow(at: indexPath, animated: true)
@@ -88,25 +148,69 @@ class ChecklistViewController: UITableViewController {
         //        self.present(vc, animated: true, completion: nil)
     }
     
-    override func tableView( _ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath
-    ) {
+    //MARK: swipe to delete a row
+    override func tableView( _ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         //destroy!!!!!!
+        
         arrayText.remove(at: indexPath.row - 1)
-        arrayChecked.remove(at: indexPath.row - 1)
+        print(arrayText)
         let indexPaths = [indexPath]
         tableView.deleteRows(at: indexPaths, with: .automatic)
+        print(arrayText)
     }
+   
     
-    @IBAction func addItem(_ inputText: String, _ status: Bool){
-        let itemAdd = inputText
-        let newItemStatus = status
-        arrayText.append(itemAdd)
-        arrayChecked.append(newItemStatus)
-        let indexPath = IndexPath(row: arrayText.count, section: 0)
+    func addItemViewController(_ controller: AddItemViewController, didFinishAdding item: String) {
+        let newRowIndex = arrayText.count
+        let addItemView = AddItemViewController()
+
+        let item = (addItemView.inputValue!, false)
+//        items.append(item)
+        arrayText.append(item)
+        let indexPath = IndexPath(row: newRowIndex, section: 0)
         let indexPaths = [indexPath]
         tableView.insertRows(at: indexPaths, with: .automatic)
-        print(arrayText!)
-        print(arrayChecked!)
+        navigationController?.popViewController(animated:true)
+        
+        print(arrayText)
+        
     }
+    
+//    func editItemViewController(_ controller: AddItemViewController, didFinishAdding item: String) {
+//        let addItemView = AddItemViewController()
+//        navigationController?.popViewController(animated:true)
+//    }
+    
+
+    
+    @IBAction func onClickAddButton(_ sender: Any) {7        print("\nChuẩn bị lấy dữ liệu")
+//        let controller = AddItemViewController()
+        let controller = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "addItemController") as? AddItemViewController
+        controller?.completetionHandler = addItemCallback
+        
+        controller?.delegate = self
+        navigationController?.pushViewController(controller!, animated: true)
+    }
+    
+    func addItemCallback(text: String) {
+        print(text)
+    }
+    
+    
+//    @IBAction func addItem(_ inputText: String, _ status: Bool){
+//        arrayText.append((inputText, status))
+//        let indexPath = IndexPath(row: arrayText.count, section: 0)
+//        let indexPaths = [indexPath]
+//        tableView.insertRows(at: indexPaths, with: .automatic)
+//        print(arrayText)
+//    }
 }
 
+
+// MARK: - IBOutlets
+// MARK: - Properties
+// MARK: - Overrides
+// MARK: - Life cycles
+// MARK: - Publics
+// MARK: - Private
+// MARK: - Actions

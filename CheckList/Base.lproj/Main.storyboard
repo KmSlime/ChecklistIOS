@@ -23,7 +23,7 @@
                     <navigationItem key="navigationItem" title="Liêm's To do list" id="Uce-VH-gKI">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="IKE-za-CB9">
                             <connections>
-                                <segue destination="w3K-Ji-6c8" kind="show" id="ZWW-xi-Gga"/>
+                                <action selector="onClickAddButton:" destination="zVB-WD-zTQ" id="olA-V6-CYC"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -35,7 +35,7 @@
         <!--Add Item-->
         <scene sceneID="MxT-H1-iVx">
             <objects>
-                <tableViewController id="w3K-Ji-6c8" customClass="AddItemViewController" customModule="CheckList" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="addItemController" id="w3K-Ji-6c8" customClass="AddItemViewController" customModule="CheckList" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="TN3-pZ-4v9">
                         <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -55,7 +55,6 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                                                     <connections>
-                                                        <action selector="addItem" destination="w3K-Ji-6c8" eventType="editingDidEnd" id="f56-Vg-pZR"/>
                                                         <action selector="done" destination="w3K-Ji-6c8" eventType="editingDidEndOnExit" id="x3e-Tv-Cro"/>
                                                         <outlet property="delegate" destination="w3K-Ji-6c8" id="no5-qe-zGc"/>
                                                     </connections>
@@ -91,7 +90,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="doneBarButton" destination="rw7-NW-aww" id="8Gl-dv-rCg"/>
-                        <outlet property="inputText" destination="QwK-Gb-BZb" id="YA5-jH-GyP"/>
+                        <outlet property="inputText" destination="QwK-Gb-BZb" id="fkF-0L-wBl"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DwL-73-ZRf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
